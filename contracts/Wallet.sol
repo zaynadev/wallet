@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.0;
+pragma solidity 0.8.15;
+pragma experimental ABIEncoderV2;
 
 contract Wallet {
-    address[] approvers;
-    uint limit;
+    address[] public approvers;
+    uint public limit;
     struct Transfer{
         uint id;
         address payable to;
@@ -30,6 +31,10 @@ contract Wallet {
         _;
     }
 
+    function getApprovers() external view returns(address[] memory){
+        return approvers;
+    }
+
     function createTransfer(address payable to) external payable onlyApprovers {
         require(msg.value > 0, "Must provide value");
         Transfer memory transfer = Transfer(
@@ -49,11 +54,17 @@ contract Wallet {
         approvals[msg.sender][id] == true;
     }
 
-    function withdraw(uint id) external {
+    function getTransfers() external view returns(Transfer[] memory){
+        return transfers;
+    }
+
+    function withdraw(uint id) external onlyApprovers{
         require(transfers[id].approvals > limit, "require approvals!!!");
-        require(transfers[id].sent == true, "already done!!!");
+        require(transfers[id].sent == false, "already done!!!");
         transfers[id].sent = true;
         transfers[id].to.transfer(transfers[id].amount);
     }
+
+    receive() external payable {}
 
 }
