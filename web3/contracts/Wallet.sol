@@ -51,7 +51,7 @@ contract Wallet {
         require(approvals[msg.sender][id] == false, "Cannot approve twice!!!");
         require(transfers[id].sent == false, "transfer already sent!!!");
         transfers[id].approvals++;
-        approvals[msg.sender][id] == true;
+        approvals[msg.sender][id] = true;
     }
 
     function getTransfers() external view returns(Transfer[] memory){
